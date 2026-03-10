@@ -1,0 +1,37 @@
+project_name: temporal_competition_graph
+
+paths:
+  data_root: data
+  raw_sec_index: data/raw/sec_index
+  raw_sec_filings: data/raw/sec_filings
+  processed_root: data/processed
+  companies: data/processed/companies
+  filings: data/processed/filings
+  evidence: data/processed/evidence
+  graphs: data/processed/graphs
+  firm_year: data/processed/firm_year
+  splits: data/processed/splits
+
+years:
+  history_start: 2015
+  history_end: 2022
+  train_target: 2023
+  val_target: 2024
+  test_target: 2025
+  max_year: 2025
+
+forms:
+  primary:
+    - "10-K"
+    - "10-K/A"
+    - "10-Q"
+    - "10-Q/A"
+    - "8-K"
+
+leakage_policy:
+  prediction_horizon: 1             # one-year-ahead prediction
+  enforce_year_truncation: true     # truncate features at cutoff year
+  disallow_future_text: true        # no filings with filing_year_bucket > cutoff
+
+random_seed: 42
+
