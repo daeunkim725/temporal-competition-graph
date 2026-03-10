@@ -13,7 +13,8 @@ class Company:
     sic: Optional[str]
     sector: Optional[str]
     industry: Optional[str]
-    is_us_public: bool
+    issuer_type: str  # "us_domestic" | "foreign_private"
+    is_us_public: bool  # True iff issuer_type == "us_domestic"
     first_year: int
     last_year: int
 

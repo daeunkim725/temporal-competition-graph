@@ -5,13 +5,13 @@ This document records explicit assumptions that shape the data pipeline, graph c
 ### Identification and Universe
 
 - **A1 (Primary key)**: The **CIK** is treated as the stable identifier for each firm. Tickers and names are auxiliary and may change over time.
-- **A2 (Universe filter)**: Only issuers identified as **U.S. public companies** in SEC metadata and filing at least one 10-K in 2015–2025 are included.
+- **A2 (Universe filter)**: The universe includes **SEC-registered public companies** only: (a) U.S. domestic issuers filing at least one 10-K in 2015–2025, and (b) foreign private issuers (FPIs) filing at least one 20-F in 2015–2025. Non-SEC-registered firms are excluded.
 - **A3 (CIK persistence)**: A CIK represents a persistent reporting entity. Corporate actions (mergers, spin-offs) that change the reporting entity appear as distinct CIKs according to SEC; there is no manual consolidation across CIKs.
 - **A4 (Active years)**: A firm is considered active only between `first_year` and `last_year`, derived from observed filings. We do **not** extrapolate activity outside this interval.
 
 ### Filings and Time Mapping
 
-- **A5 (Form types)**: Relevant forms are 10-K, 10-K/A, 10-Q, 10-Q/A, and 8-K. Other forms are ignored for now.
+- **A5 (Form types)**: Relevant forms are 10-K, 10-K/A, 10-Q, 10-Q/A, 8-K (U.S. domestic); 20-F, 20-F/A, 6-K (foreign private issuers). Other forms are ignored for now.
 - **A6 (Calendar year bucketing)**: `filing_year_bucket` is defined as the calendar year of `filing_date`. Fiscal year differences are not explicitly modeled at this stage.
 - **A7 (Evidence year)**: All evidence derived from a filing is assigned `evidence_year = filing_year_bucket`. This simplifies temporal alignment at the cost of small timing imprecision.
 - **A8 (Multiple filings per year)**: If a firm files multiple relevant forms in a year, all evidence from those filings contributes to the same `evidence_year`.
@@ -32,7 +32,7 @@ This document records explicit assumptions that shape the data pipeline, graph c
 - **A14 (Explicit mentions)**: Phrases that unambiguously enumerate competitors (e.g., “our competitors include X, Y, Z”) are treated as explicit evidence, regardless of strength.
 - **A15 (Entity resolution)**: Mapping `target_name_str` to `target_cik` is performed in a separate, auditable step with confidence scores. Mentions that cannot be resolved above a threshold remain with `target_cik = null`.
 - **A16 (Implicit evidence without names)**: Sentences indicating competition without naming specific rivals are first stored as **firm-year-level signals** and only later mapped to directed edges where justifiable.
-- **A17 (Events)**: 8-K events are assumed to affect competition intensity for at least one year starting at `event_date`. Exact decay windows are a modeling choice, not a data fact.
+- **A17 (Events)**: 8-K (U.S.) and 6-K (foreign) events are assumed to affect competition intensity for at least one year starting at `event_date`. Exact decay windows are a modeling choice, not a data fact.
 
 ### Temporal Forecasting and Leakage
 

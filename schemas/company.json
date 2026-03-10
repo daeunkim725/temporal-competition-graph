@@ -9,11 +9,12 @@
     "sic": { "type": ["string", "integer", "null"] },
     "sector": { "type": ["string", "null"] },
     "industry": { "type": ["string", "null"] },
+    "issuer_type": { "type": "string", "enum": ["us_domestic", "foreign_private"] },
     "is_us_public": { "type": "boolean" },
     "first_year": { "type": "integer" },
     "last_year": { "type": "integer" }
   },
-  "required": ["cik", "company_name", "is_us_public", "first_year", "last_year"],
+  "required": ["cik", "company_name", "issuer_type", "is_us_public", "first_year", "last_year"],
   "additionalProperties": false
 }
 

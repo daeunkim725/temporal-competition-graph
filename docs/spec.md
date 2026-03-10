@@ -2,7 +2,7 @@
 
 ### Scope and Objective
 
-This project builds a **temporally evaluated, directed, weighted competition graph** over U.S. public companies using SEC filings (10-K, 10-Q, 8-K).
+This project builds a **temporally evaluated, directed, weighted competition graph** over SEC-registered public companies (U.S. domestic and foreign private issuers) using SEC filings (10-K, 10-Q, 8-K for U.S. issuers; 20-F, 6-K for foreign issuers).
 
 The primary goals are:
 - **G1**: Construct a leakage-safe, year-indexed competition graph where edges represent directed competition intensity from a *source* firm (disclosing filer) to a *target* firm (named or inferred competitor).
@@ -12,9 +12,10 @@ The primary goals are:
 ### Universe Definition
 
 - **Entity key**: `cik` (Central Index Key) is the primary identifier for all firms.
-- **Universe**: U.S. public firms that:
-  - File at least one **10-K** in the window **2015–2025**.
-  - Are tagged as U.S. issuers in SEC metadata.
+- **Universe**: SEC-registered public companies in a **single unified graph**:
+  - **U.S. domestic issuers**: File at least one **10-K** in 2015–2025; tagged as U.S. issuers in SEC metadata.
+  - **Foreign private issuers (FPIs)**: File at least one **20-F** in 2015–2025; SEC-registered foreign issuers only.
+- **Graph**: One graph containing both U.S. and foreign firms; same temporal splits (2023 train, 2024 val, 2025 test) apply to all.
 - **Inclusion window per firm**:
   - `first_year`: first calendar year in which we observe a qualifying filing (10-K / 10-Q / 8-K).
   - `last_year`: last calendar year in which we observe any relevant filing.
@@ -37,7 +38,7 @@ The primary goals are:
 - **Layers**:
   - **Explicit layer**:
     - Evidence from directly named competitors in filings (e.g., “our competitors include X, Y, Z”).
-    - Primary forms: 10-K (and possibly 10-K/A; 10-Q later).
+    - Primary forms: 10-K, 10-K/A, 10-Q (U.S.); 20-F, 20-F/A (foreign).
   - **Implicit layer**:
     - Evidence from text suggesting competition without explicit naming, including:
       - Product-market overlap.
@@ -48,7 +49,7 @@ The primary goals are:
       - Rivalry language.
     - May be directed (when co-mentioned competitors exist) or stored as firm-year signals.
   - **Event layer**:
-    - Evidence derived from **8-K** event disclosures indicating changes in competitive intensity, such as:
+    - Evidence derived from **8-K** (U.S.) and **6-K** (foreign) event disclosures indicating changes in competitive intensity, such as:
       - M&A involving competitors.
       - Entry into / exit from markets.
       - Major customer wins/losses that affect rivalry.

@@ -14,7 +14,8 @@ This document specifies the logical schemas for the main tables. Implementation 
   - `sic` (string/int, nullable) — Standard Industrial Classification.
   - `sector` (string, nullable)
   - `industry` (string, nullable)
-  - `is_us_public` (bool, not null)
+  - `issuer_type` (string, not null) — `us_domestic` or `foreign_private`.
+  - `is_us_public` (bool, not null) — `true` iff `issuer_type == "us_domestic"`; kept for backward compatibility.
   - `first_year` (int, not null) — first calendar year with any relevant filing.
   - `last_year` (int, not null) — last calendar year with any relevant filing.
 
@@ -26,7 +27,7 @@ This document specifies the logical schemas for the main tables. Implementation 
 - **Columns**
   - `accession_number` (string, not null)
   - `cik` (string/int, not null)
-  - `form_type` (string, not null) — e.g., `10-K`, `10-K/A`, `10-Q`, `10-Q/A`, `8-K`.
+  - `form_type` (string, not null) — e.g., `10-K`, `10-K/A`, `10-Q`, `10-Q/A`, `8-K`, `20-F`, `20-F/A`, `6-K`.
   - `filing_date` (date, not null)
   - `period_of_report` (date, nullable)
   - `fiscal_year` (int, nullable)
