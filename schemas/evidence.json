@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Evidence",
+  "type": "object",
+  "properties": {
+    "accession_number": { "type": "string" },
+    "evidence_id": { "type": ["string", "integer"] },
+    "source_cik": { "type": ["string", "integer"] },
+    "target_cik": { "type": ["string", "integer", "null"] },
+    "target_name_str": { "type": ["string", "null"] },
+    "signal_type": {
+      "type": "string",
+      "enum": ["explicit", "implicit", "event"]
+    },
+    "subtype": { "type": "string" },
+    "section": { "type": ["string", "null"] },
+    "snippet_start_char": { "type": ["integer", "null"] },
+    "snippet_end_char": { "type": ["integer", "null"] },
+    "snippet_text": { "type": "string" },
+    "score": { "type": "number" },
+    "direction": { "type": "string" },
+    "evidence_year": { "type": "integer" },
+    "resolution_confidence": { "type": ["number", "null"] }
+  },
+  "required": [
+    "accession_number",
+    "evidence_id",
+    "source_cik",
+    "signal_type",
+    "subtype",
+    "snippet_text",
+    "score",
+    "direction",
+    "evidence_year"
+  ],
+  "additionalProperties": false
+}
+

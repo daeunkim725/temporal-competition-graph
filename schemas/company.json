@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Company",
+  "type": "object",
+  "properties": {
+    "cik": { "type": ["string", "integer"] },
+    "ticker": { "type": ["string", "null"] },
+    "company_name": { "type": "string" },
+    "sic": { "type": ["string", "integer", "null"] },
+    "sector": { "type": ["string", "null"] },
+    "industry": { "type": ["string", "null"] },
+    "is_us_public": { "type": "boolean" },
+    "first_year": { "type": "integer" },
+    "last_year": { "type": "integer" }
+  },
+  "required": ["cik", "company_name", "is_us_public", "first_year", "last_year"],
+  "additionalProperties": false
+}
+

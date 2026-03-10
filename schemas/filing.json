@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Filing",
+  "type": "object",
+  "properties": {
+    "accession_number": { "type": "string" },
+    "cik": { "type": ["string", "integer"] },
+    "form_type": { "type": "string" },
+    "filing_date": { "type": "string", "format": "date" },
+    "period_of_report": { "type": ["string", "null"], "format": "date" },
+    "fiscal_year": { "type": ["integer", "null"] },
+    "filing_year_bucket": { "type": "integer" },
+    "source_url": { "type": "string" },
+    "local_path_raw": { "type": "string" },
+    "local_path_clean": { "type": ["string", "null"] },
+    "text_version": { "type": "string" },
+    "has_parsing_errors": { "type": "boolean" }
+  },
+  "required": [
+    "accession_number",
+    "cik",
+    "form_type",
+    "filing_date",
+    "filing_year_bucket",
+    "source_url",
+    "local_path_raw",
+    "text_version",
+    "has_parsing_errors"
+  ],
+  "additionalProperties": false
+}
+
