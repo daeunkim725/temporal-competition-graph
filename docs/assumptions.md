@@ -5,7 +5,7 @@ This document records explicit assumptions that shape the data pipeline, graph c
 ### Identification and Universe
 
 - **A1 (Primary key)**: The **CIK** is treated as the stable identifier for each firm. Tickers and names are auxiliary and may change over time.
-- **A2 (Universe filter)**: The universe includes **SEC-registered public companies** only: (a) U.S. domestic issuers filing at least one 10-K in 2015–2025, and (b) foreign private issuers (FPIs) filing at least one 20-F in 2015–2025. Non-SEC-registered firms are excluded.
+- **A2 (Universe filter)**: The universe includes **SEC-registered public companies** only: (a) U.S. domestic issuers filing at least one 10-K in 2023–2025, and (b) foreign private issuers (FPIs) filing at least one 20-F in 2023–2025. Non-SEC-registered firms are excluded. Universe is restricted to 2023–2025 for data download and company inclusion.
 - **A3 (CIK persistence)**: A CIK represents a persistent reporting entity. Corporate actions (mergers, spin-offs) that change the reporting entity appear as distinct CIKs according to SEC; there is no manual consolidation across CIKs.
 - **A4 (Active years)**: A firm is considered active only between `first_year` and `last_year`, derived from observed filings. We do **not** extrapolate activity outside this interval.
 

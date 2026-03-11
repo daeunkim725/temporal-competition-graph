@@ -18,8 +18,8 @@ from pathlib import Path
 def run_pipeline(
     drive_root: str | Path,
     config_path: str | Path | None = None,
-    year_start: int = 2023,
-    year_end: int = 2025,
+    year_start: int | None = None,
+    year_end: int | None = None,
     download_limit: int | None = None,
 ) -> None:
     """
@@ -42,6 +42,8 @@ def run_pipeline(
     from src.data.clean_filings import clean_filings, build_filings_table
 
     cfg = load_config(config_path=config_path, base_path=drive_root)
+    year_start = year_start if year_start is not None else cfg.years.universe_start
+    year_end = year_end if year_end is not None else cfg.years.universe_end
 
     print("Step 1a: Downloading SEC index...")
     download_sec_index(cfg.paths.raw_sec_index, year_start=year_start, year_end=year_end)
@@ -71,8 +73,8 @@ if __name__ == "__main__":
     import argparse
     p = argparse.ArgumentParser()
     p.add_argument("--drive-root", default="/content/drive/MyDrive/temporal-competition-graph")
-    p.add_argument("--year-start", type=int, default=2015)
-    p.add_argument("--year-end", type=int, default=2025)
+    p.add_argument("--year-start", type=int, default=None, help="Default: from config (2023)")
+    p.add_argument("--year-end", type=int, default=None, help="Default: from config (2025)")
     p.add_argument("--download-limit", type=int, default=None, help="Limit filings for testing")
     args = p.parse_args()
     run_pipeline(

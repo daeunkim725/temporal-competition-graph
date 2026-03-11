@@ -12,9 +12,10 @@ The primary goals are:
 ### Universe Definition
 
 - **Entity key**: `cik` (Central Index Key) is the primary identifier for all firms.
+- **Universe window**: 2023–2025 only (restricted for data download and company inclusion).
 - **Universe**: SEC-registered public companies in a **single unified graph**:
-  - **U.S. domestic issuers**: File at least one **10-K** in 2015–2025; tagged as U.S. issuers in SEC metadata.
-  - **Foreign private issuers (FPIs)**: File at least one **20-F** in 2015–2025; SEC-registered foreign issuers only.
+  - **U.S. domestic issuers**: File at least one **10-K** in 2023–2025; tagged as U.S. issuers in SEC metadata.
+  - **Foreign private issuers (FPIs)**: File at least one **20-F** in 2023–2025; SEC-registered foreign issuers only.
 - **Graph**: One graph containing both U.S. and foreign firms; same temporal splits (2023 train, 2024 val, 2025 test) apply to all.
 - **Inclusion window per firm**:
   - `first_year`: first calendar year in which we observe a qualifying filing (10-K / 10-Q / 8-K).
@@ -23,7 +24,8 @@ The primary goals are:
 
 ### Temporal Horizon and Granularity
 
-- **Modeling horizon**: 2015–2025 inclusive.
+- **Data horizon**: 2023–2025 (universe and filing download).
+- **Modeling horizon**: 2015–2025 inclusive (for historical context when available).
 - **Graph time unit**: **calendar year**.
 - **Filing-to-year mapping**:
   - `filing_year_bucket = year(filing_date)` (calendar year of `filing_date`).

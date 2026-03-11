@@ -23,7 +23,7 @@ def build_company_universe(
     """
     Build companies.parquet from SEC index.
 
-    Inclusion: at least one 10-K in [history_start, max_year].
+    Inclusion: at least one 10-K in [universe_start, universe_end].
     Sets first_year, last_year from observed filings (10-K, 10-Q, 8-K).
     """
     cfg = config or load_config()
@@ -43,8 +43,8 @@ def build_company_universe(
 
     filings = load_filing_index(
         index_dir,
-        year_start=cfg.years.history_start,
-        year_end=cfg.years.max_year,
+        year_start=cfg.years.universe_start,
+        year_end=cfg.years.universe_end,
         form_types=cfg.forms.target_forms,
         exclude_amendments=cfg.forms.exclude_amendments,
     )

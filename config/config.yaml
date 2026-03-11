@@ -20,6 +20,10 @@ paths:
   splits: data/processed/splits
 
 years:
+  # Universe and download window: 2023-2025 only
+  universe_start: 2023
+  universe_end: 2025
+  # Modeling splits (for later)
   history_start: 2015
   history_end: 2022
   train_target: 2023
@@ -52,6 +56,6 @@ leakage_policy:
 
 random_seed: 42
 
-# SEC requires a descriptive User-Agent with contact info
-sec_user_agent: "temporal-competition-graph research / your-email@example.com"
+# SEC requires: "ProjectName YourEmail@domain.com" - use your real email or 403 errors
+sec_user_agent: "temporal-competition-graph YourName your.email@example.com"
 

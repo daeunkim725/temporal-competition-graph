@@ -18,6 +18,7 @@ from ..common.config import ProjectConfig, load_config
 from .sec_index_downloader import load_filing_index, _session, RATE_LIMIT_DELAY
 
 SEC_BASE = "https://www.sec.gov"
+MAX_RETRIES = 3
 
 
 def _filing_url(filename: str) -> str:
@@ -48,8 +49,8 @@ def download_filings(
     companies_path = companies_path or (cfg.paths.companies / "companies.parquet")
     index_dir = index_dir or cfg.paths.raw_sec_index
     raw_dir = raw_dir or cfg.paths.raw_sec_filings
-    year_start = year_start or cfg.years.history_start
-    year_end = year_end or cfg.years.max_year
+    year_start = year_start or cfg.years.universe_start
+    year_end = year_end or cfg.years.universe_end
 
     companies = pd.read_parquet(companies_path)
     ciks = set(companies["cik"].astype(str).str.zfill(10))
@@ -79,15 +80,29 @@ def download_filings(
             continue
 
         url = _filing_url(row["filename"])
-        try:
-            r = sess.get(url, timeout=120)
-            r.raise_for_status()
-            out_path.parent.mkdir(parents=True, exist_ok=True)
-            out_path.write_bytes(r.content)
-            results.append(_row_to_filing_meta(row, str(out_path)))
-        except Exception as e:
-            # Log but continue
-            print(f"Failed {cik} {acc}: {e}")
+        ok = False
+        for attempt in range(MAX_RETRIES):
+            try:
+                r = sess.get(url, timeout=120)
+                r.raise_for_status()
+                out_path.parent.mkdir(parents=True, exist_ok=True)
+                out_path.write_bytes(r.content)
+                results.append(_row_to_filing_meta(row, str(out_path)))
+                ok = True
+                break
+            except requests.HTTPError as e:
+                if e.response.status_code in (403, 429):
+                    wait = (attempt + 1) * 3
+                    print(f"SEC {e.response.status_code} {cik} {acc}, retry in {wait}s...")
+                    time.sleep(wait)
+                else:
+                    print(f"Failed {cik} {acc}: {e}")
+                    break
+            except Exception as e:
+                print(f"Failed {cik} {acc}: {e}")
+                break
+        if not ok:
+            print(f"Gave up {cik} {acc} after {MAX_RETRIES} retries (403=bad User-Agent or blocked IP)")
         time.sleep(RATE_LIMIT_DELAY)
 
     return pd.DataFrame(results)

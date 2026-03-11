@@ -9,7 +9,7 @@ from src.data.build_company_universe import build_company_universe
 
 cfg = load_config()
 print('Downloading SEC index...')
-download_sec_index(cfg.paths.raw_sec_index, cfg.years.history_start, cfg.years.max_year)
+download_sec_index(cfg.paths.raw_sec_index, cfg.years.universe_start, cfg.years.universe_end)
 print('Building company universe...')
 build_company_universe(config=cfg)
 print('Done:', cfg.paths.companies / 'companies.parquet')

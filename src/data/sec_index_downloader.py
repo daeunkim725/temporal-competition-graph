@@ -3,11 +3,15 @@ Download SEC EDGAR filing index and company metadata.
 
 Uses SEC full-index files (company.idx) and company_tickers.json.
 Respects SEC rate limits; use User-Agent per SEC guidelines.
+
+SEC requires: User-Agent with format "CompanyName AdminContact@company.com"
+Update config sec_user_agent with your real email. 403 = blocked (bad User-Agent or cloud IP).
 """
 
 from __future__ import annotations
 
 import json
+import os
 import re
 import time
 from pathlib import Path
@@ -16,24 +20,57 @@ from typing import Iterator
 import pandas as pd
 import requests
 
-# SEC requires a descriptive User-Agent; override via config or env
-SEC_USER_AGENT = "temporal-competition-graph research / contact@example.com"
 SEC_BASE = "https://www.sec.gov"
-RATE_LIMIT_DELAY = 0.15  # ~10 req/sec max per SEC guidance
+RATE_LIMIT_DELAY = 0.2  # ~5 req/sec to stay under SEC limit
+MAX_RETRIES = 3
 
 
-def _session() -> requests.Session:
+def _get_user_agent() -> str:
+    """User-Agent from config, env, or fallback. SEC requires real contact info."""
+    ua = os.environ.get("SEC_USER_AGENT")
+    if ua:
+        return ua
+    try:
+        from ..common.config import load_config
+        cfg = load_config()
+        ua = getattr(cfg, "sec_user_agent", "") or ""
+        if ua and "example.com" not in ua.lower():
+            return ua
+    except Exception:
+        pass
+    return "temporal-competition-graph research project / contact@example.com"
+
+
+def _session(user_agent: str | None = None) -> requests.Session:
+    ua = user_agent or _get_user_agent()
     s = requests.Session()
-    s.headers.update({"User-Agent": SEC_USER_AGENT, "Accept-Encoding": "gzip, deflate"})
+    s.headers.update({
+        "User-Agent": ua,
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Encoding": "gzip, deflate",
+        "Host": "www.sec.gov",
+    })
     return s
 
 
 def _get(url: str, session: requests.Session | None = None) -> str:
     sess = session or _session()
-    r = sess.get(url, timeout=60)
-    r.raise_for_status()
-    time.sleep(RATE_LIMIT_DELAY)
-    return r.text
+    last_err = None
+    for attempt in range(MAX_RETRIES):
+        try:
+            r = sess.get(url, timeout=90)
+            r.raise_for_status()
+            time.sleep(RATE_LIMIT_DELAY)
+            return r.text
+        except requests.HTTPError as e:
+            last_err = e
+            if e.response.status_code in (403, 429):
+                wait = (attempt + 1) * 2
+                print(f"SEC {e.response.status_code}, retry in {wait}s...")
+                time.sleep(wait)
+            else:
+                raise
+    raise last_err
 
 
 def download_company_tickers(out_path: Path) -> Path:

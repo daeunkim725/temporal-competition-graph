@@ -25,6 +25,8 @@ class PathsConfig:
 
 @dataclasses.dataclass
 class YearsConfig:
+    universe_start: int
+    universe_end: int
     history_start: int
     history_end: int
     train_target: int
@@ -55,6 +57,7 @@ class ProjectConfig:
     forms: FormsConfig
     leakage_policy: LeakagePolicyConfig
     random_seed: int
+    sec_user_agent: str = ""
 
     @property
     def train_cutoff_year(self) -> int:
@@ -109,6 +112,8 @@ def load_config(
     )
 
     years_cfg = YearsConfig(
+        universe_start=int(raw["years"].get("universe_start", raw["years"]["train_target"])),
+        universe_end=int(raw["years"].get("universe_end", raw["years"]["max_year"])),
         history_start=int(raw["years"]["history_start"]),
         history_end=int(raw["years"]["history_end"]),
         train_target=int(raw["years"]["train_target"]),
@@ -136,6 +141,7 @@ def load_config(
         forms=forms_cfg,
         leakage_policy=leakage_cfg,
         random_seed=int(raw["random_seed"]),
+        sec_user_agent=str(raw.get("sec_user_agent", "")),
     )
 
 
