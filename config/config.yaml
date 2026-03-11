@@ -1,5 +1,10 @@
 project_name: temporal_competition_graph
 
+# Base path for data storage. Use empty string for project-relative paths.
+# For Colab + Google Drive: set to /content/drive/MyDrive/temporal-competition-graph
+# or pass via env/code before load_config.
+base_path: ""
+
 paths:
   data_root: data
   raw_sec_index: data/raw/sec_index
@@ -7,6 +12,8 @@ paths:
   processed_root: data/processed
   companies: data/processed/companies
   filings: data/processed/filings
+  filings_sections: data/processed/filings/sections
+  filings_sentences: data/processed/filings/sentences
   evidence: data/processed/evidence
   graphs: data/processed/graphs
   firm_year: data/processed/firm_year
@@ -21,6 +28,7 @@ years:
   max_year: 2025
 
 forms:
+  # All forms used for company universe (10-K for U.S., 20-F for foreign)
   primary:
     - "10-K"
     - "10-K/A"
@@ -30,6 +38,12 @@ forms:
     - "20-F"
     - "20-F/A"
     - "6-K"
+  # Target forms for filing download and cleaning (excludes amendments)
+  target_forms:
+    - "10-K"
+    - "10-Q"
+    - "8-K"
+  exclude_amendments: true
 
 leakage_policy:
   prediction_horizon: 1             # one-year-ahead prediction
@@ -37,4 +51,7 @@ leakage_policy:
   disallow_future_text: true        # no filings with filing_year_bucket > cutoff
 
 random_seed: 42
+
+# SEC requires a descriptive User-Agent with contact info
+sec_user_agent: "temporal-competition-graph research / your-email@example.com"
 

@@ -15,6 +15,8 @@ class PathsConfig:
     processed_root: Path
     companies: Path
     filings: Path
+    filings_sections: Path
+    filings_sentences: Path
     evidence: Path
     graphs: Path
     firm_year: Path
@@ -34,6 +36,8 @@ class YearsConfig:
 @dataclasses.dataclass
 class FormsConfig:
     primary: list[str]
+    target_forms: list[str]
+    exclude_amendments: bool
 
 
 @dataclasses.dataclass
@@ -71,27 +75,37 @@ def _load_yaml(path: Path) -> Dict[str, Any]:
         return yaml.safe_load(f)
 
 
-def load_config(config_path: str | Path = "config/config.yaml") -> ProjectConfig:
+def load_config(
+    config_path: str | Path = "config/config.yaml",
+    base_path: str | Path | None = None,
+) -> ProjectConfig:
     """
     Load the project configuration from YAML and return a typed ProjectConfig.
 
-    This helper should be used by all scripts to ensure a single source of truth
-    for paths, years, and leakage-related settings.
+    base_path: If set, all data paths are resolved relative to this (e.g. Google
+        Drive root). If None, uses config "base_path" or project-relative paths.
     """
     path = Path(config_path)
     raw = _load_yaml(path)
 
+    base = Path(base_path) if base_path is not None else Path(raw.get("base_path", ""))
+    def _p(rel: str) -> Path:
+        p = Path(rel)
+        return (base / p) if base else p
+
     paths_cfg = PathsConfig(
-        data_root=Path(raw["paths"]["data_root"]),
-        raw_sec_index=Path(raw["paths"]["raw_sec_index"]),
-        raw_sec_filings=Path(raw["paths"]["raw_sec_filings"]),
-        processed_root=Path(raw["paths"]["processed_root"]),
-        companies=Path(raw["paths"]["companies"]),
-        filings=Path(raw["paths"]["filings"]),
-        evidence=Path(raw["paths"]["evidence"]),
-        graphs=Path(raw["paths"]["graphs"]),
-        firm_year=Path(raw["paths"]["firm_year"]),
-        splits=Path(raw["paths"]["splits"]),
+        data_root=_p(raw["paths"]["data_root"]),
+        raw_sec_index=_p(raw["paths"]["raw_sec_index"]),
+        raw_sec_filings=_p(raw["paths"]["raw_sec_filings"]),
+        processed_root=_p(raw["paths"]["processed_root"]),
+        companies=_p(raw["paths"]["companies"]),
+        filings=_p(raw["paths"]["filings"]),
+        filings_sections=_p(raw["paths"].get("filings_sections", str(Path(raw["paths"]["filings"]) / "sections"))),
+        filings_sentences=_p(raw["paths"].get("filings_sentences", str(Path(raw["paths"]["filings"]) / "sentences"))),
+        evidence=_p(raw["paths"]["evidence"]),
+        graphs=_p(raw["paths"]["graphs"]),
+        firm_year=_p(raw["paths"]["firm_year"]),
+        splits=_p(raw["paths"]["splits"]),
     )
 
     years_cfg = YearsConfig(
@@ -103,7 +117,11 @@ def load_config(config_path: str | Path = "config/config.yaml") -> ProjectConfig
         max_year=int(raw["years"]["max_year"]),
     )
 
-    forms_cfg = FormsConfig(primary=list(raw["forms"]["primary"]))
+    forms_cfg = FormsConfig(
+        primary=list(raw["forms"]["primary"]),
+        target_forms=list(raw["forms"].get("target_forms", ["10-K", "10-Q", "8-K"])),
+        exclude_amendments=bool(raw["forms"].get("exclude_amendments", True)),
+    )
 
     leakage_cfg = LeakagePolicyConfig(
         prediction_horizon=int(raw["leakage_policy"]["prediction_horizon"]),

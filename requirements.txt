@@ -1,0 +1,13 @@
+# Core
+pyyaml>=6.0
+pandas>=2.0
+pyarrow>=14.0
+requests>=2.28
+
+# HTML parsing and cleaning
+beautifulsoup4>=4.12
+lxml>=4.9
+
+# Optional: for Colab/Drive (install in notebook if needed)
+# google-colab  # pre-installed in Colab
+# PyDrive2  # if using older Drive API
