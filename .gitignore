@@ -1,5 +1,5 @@
-# Data (large, not versioned) - only root data/ folder
-/data/
+# Data (large, not versioned)
+data/
 *.parquet
 
 # Python
