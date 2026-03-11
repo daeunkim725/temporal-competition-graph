@@ -18,7 +18,7 @@ from pathlib import Path
 def run_pipeline(
     drive_root: str | Path,
     config_path: str | Path | None = None,
-    year_start: int = 2015,
+    year_start: int = 2023,
     year_end: int = 2025,
     download_limit: int | None = None,
 ) -> None:
